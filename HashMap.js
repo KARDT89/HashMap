@@ -4,6 +4,7 @@ class HashMap {
         this.bucket = new Array(this.capacity).fill(null);
         this.load_factor = 0;
         this.threshold = threshold;
+        this.totalStoredKeys = 0
     }
 
     // recieve bucket index
@@ -23,7 +24,9 @@ class HashMap {
 
         if (this.bucket[bucketIndex] === null) {
             this.bucket[bucketIndex] = [[`${key}`, value]];
+            this.totalStoredKeys++
             this.load_factor++;
+            return `Successfully Added -> [${key}: ${value}]`;
         } else {
             const bucketIndexLength = this.bucket[bucketIndex].length;
             for (let i = 0; i < bucketIndexLength; i++) {
@@ -35,6 +38,7 @@ class HashMap {
             }
             this.bucket[bucketIndex].push([`${key}`, value]);
         }
+        this.totalStoredKeys++
         this.load_factor++;
         return `Successfully Added -> [${key}: ${value}]`;
     }
@@ -74,11 +78,19 @@ class HashMap {
                 const bucketKey = this.bucket[bucketIndex][i][0];
                 if (bucketKey === key) {
                     this.bucket[bucketIndex].splice(i, 1);
+
+                    this.totalStoredKeys--
+                    this.load_factor--
+
                     return true;
                 }
             }
         }
         return false;
+    }
+
+    length(){
+        return this.totalStoredKeys
     }
 
     checkLoadFactor() {
@@ -99,9 +111,10 @@ class HashMap {
 
 let test = new HashMap();
 
-test.set("pot", 10);
-test.set("top", 20);
+test.set("Sara", 10);
+test.set("raSa", 20);
 test.set("bac", 21);
 console.log(test.set("cat", "new val"))
-console.log(test.bucket);
+console.log(test.remove("cat"))
+console.log(test.length());
 
