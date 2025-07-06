@@ -52,6 +52,34 @@ class HashMap {
         }
         return null;
     }
+    has(key) {
+        const bucketIndex = this.hash(key);
+        if (this.bucket[bucketIndex]) {
+            const bucketIndexLength = this.bucket[bucketIndex].length;
+            for (let i = 0; i < bucketIndexLength; i++) {
+                const bucketKey = this.bucket[bucketIndex][i][0];
+                if (bucketKey === key) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    remove(key) {
+        const bucketIndex = this.hash(key);
+        if (this.bucket[bucketIndex]) {
+            const bucketIndexLength = this.bucket[bucketIndex].length;
+            for (let i = 0; i < bucketIndexLength; i++) {
+                const bucketKey = this.bucket[bucketIndex][i][0];
+                if (bucketKey === key) {
+                    this.bucket[bucketIndex].splice(i, 1);
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 
     checkLoadFactor() {
         let size = 0;
@@ -71,11 +99,9 @@ class HashMap {
 
 let test = new HashMap();
 
-test.set("tac", 10);
-test.set("cat", 20);
-console.log(test.set("cat", 21));
-// console.log(test.set("cat", "new val"))
+test.set("pot", 10);
+test.set("top", 20);
+test.set("bac", 21);
+console.log(test.set("cat", "new val"))
+console.log(test.bucket);
 
-
-console.log(test.get("cat"));
-// console.log(test.get("sex"));
