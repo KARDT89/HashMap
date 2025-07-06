@@ -1,10 +1,9 @@
 class HashMap {
-    constructor(capacity = 16, threshold = 0.75) {
+    constructor(capacity = 16, load_factor = 0.75) {
         this.capacity = capacity;
         this.bucket = new Array(this.capacity).fill(null);
-        this.load_factor = 0;
-        this.threshold = threshold;
-        this.totalStoredKeys = 0
+        this.load_factor = load_factor;
+        this.totalStoredKeys = 0;
     }
 
     // recieve bucket index
@@ -24,8 +23,8 @@ class HashMap {
 
         if (this.bucket[bucketIndex] === null) {
             this.bucket[bucketIndex] = [[`${key}`, value]];
-            this.totalStoredKeys++
-            this.load_factor++;
+            this.totalStoredKeys++;
+            this.validate()
             return `Successfully Added -> [${key}: ${value}]`;
         } else {
             const bucketIndexLength = this.bucket[bucketIndex].length;
@@ -38,8 +37,8 @@ class HashMap {
             }
             this.bucket[bucketIndex].push([`${key}`, value]);
         }
-        this.totalStoredKeys++
-        this.load_factor++;
+        this.totalStoredKeys++;
+        this.validate()
         return `Successfully Added -> [${key}: ${value}]`;
     }
 
@@ -77,11 +76,13 @@ class HashMap {
             for (let i = 0; i < bucketIndexLength; i++) {
                 const bucketKey = this.bucket[bucketIndex][i][0];
                 if (bucketKey === key) {
-                    this.bucket[bucketIndex].splice(i, 1);
-
-                    this.totalStoredKeys--
-                    this.load_factor--
-
+                    if (bucketIndexLength === 1) {
+                        this.bucket[bucketIndex] = null;
+                    } else {
+                        this.bucket[bucketIndex].splice(i, 1);
+                    }
+                    this.totalStoredKeys--;
+                    this.validate()
                     return true;
                 }
             }
@@ -89,32 +90,84 @@ class HashMap {
         return false;
     }
 
-    length(){
-        return this.totalStoredKeys
+    length() {
+        return this.totalStoredKeys;
     }
 
-    checkLoadFactor() {
-        let size = 0;
-        for (let i = 0; i < this.capacity; i++) {
-            if (this.bucket[i] !== null) {
-                size += this.bucket[i].length;
+    clear() {
+        this.bucket = new Array(this.capacity).fill(null);
+        this.load_factor = 0;
+        this.totalStoredKeys = 0;
+        return "Successfully Removed All Entries";
+    }
+
+    keys() {
+        let result = [];
+        for (let i = 0; i < this.bucket.length; i++) {
+            if (this.bucket[i]) {
+                for (let j = 0; j < this.bucket[i].length; j++) {
+                    result.push(this.bucket[i][j][0]);
+                }
             }
         }
-        this.load_factor = size / this.capacity;
-        if (this.load_factor > this.threshold) {
-            this.capacity = this.capacity * 2;
-            // todo after resize re-set all the values in their bucket
+        return result;
+    }
+
+    values() {
+        let result = [];
+        for (let i = 0; i < this.bucket.length; i++) {
+            if (this.bucket[i]) {
+                for (let j = 0; j < this.bucket[i].length; j++) {
+                    result.push(this.bucket[i][j][1]);
+                }
+            }
+        }
+        return result;
+    }
+    entries() {
+        let result = [];
+        for (let i = 0; i < this.bucket.length; i++) {
+            if (this.bucket[i]) {
+                for (let j = 0; j < this.bucket[i].length; j++) {
+                    result.push(this.bucket[i][j]);
+                }
+            }
+        }
+        return result;
+    }
+
+    validate() {
+        if (this.totalStoredKeys / this.capacity > this.load_factor) {
+            this.capacity *= 2;
+            this.reHash()
+        } 
+        // todo make it dynamic
+    }
+    reHash() {
+        const entries = this.entries();
+        this.bucket = new Array(this.capacity).fill(null);
+        this.totalStoredKeys = 0;
+        for (let [key, value] of entries) {
+            this.set(key, value);
         }
     }
-    reHash() {}
 }
 
-let test = new HashMap();
+const test = new HashMap(); // or HashMap() if using a factory
+test.set("apple", "red");
+test.set("banana", "yellow");
+test.set("carrot", "orange");
+test.set("dog", "brown");
+test.set("elephant", "gray");
+test.set("frog", "green");
+test.set("grape", "purple");
+test.set("hat", "black");
+test.set("ice cream", "white");
+test.set("jacket", "blue");
+test.set("kite", "pink");
+test.set("lion", "golden");
+test.set("lion2", "golden");
 
-test.set("Sara", 10);
-test.set("raSa", 20);
-test.set("bac", 21);
-console.log(test.set("cat", "new val"))
-console.log(test.remove("cat"))
-console.log(test.length());
 
+console.log(test.remove("elephant"));
+console.log(test.capacity);
