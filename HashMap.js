@@ -23,6 +23,7 @@ class HashMap {
 
         if (this.bucket[bucketIndex] === null) {
             this.bucket[bucketIndex] = [[`${key}`, value]];
+            this.load_factor++;
         } else {
             const bucketIndexLength = this.bucket[bucketIndex].length;
             for (let i = 0; i < bucketIndexLength; i++) {
@@ -34,7 +35,22 @@ class HashMap {
             }
             this.bucket[bucketIndex].push([`${key}`, value]);
         }
+        this.load_factor++;
         return `Successfully Added -> [${key}: ${value}]`;
+    }
+
+    get(key) {
+        const bucketIndex = this.hash(key);
+        if (this.bucket[bucketIndex]) {
+            const bucketIndexLength = this.bucket[bucketIndex].length;
+            for (let i = 0; i < bucketIndexLength; i++) {
+                const bucketKey = this.bucket[bucketIndex][i][0];
+                if (bucketKey === key) {
+                    return this.bucket[bucketIndex][i];
+                }
+            }
+        }
+        return null;
     }
 
     checkLoadFactor() {
@@ -60,4 +76,6 @@ test.set("cat", 20);
 console.log(test.set("cat", 21));
 // console.log(test.set("cat", "new val"))
 
-console.log(test.bucket);
+
+console.log(test.get("cat"));
+// console.log(test.get("sex"));
