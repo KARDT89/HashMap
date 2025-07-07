@@ -1,0 +1,21 @@
+{
+  "name": "hashmap",
+  "version": "1.0.0",
+  "description": "",
+  "main": "HashMap.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/KARDT89/HashMap.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/KARDT89/HashMap/issues"
+  },
+  "homepage": "https://github.com/KARDT89/HashMap#readme"
+}

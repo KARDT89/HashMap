@@ -1,4 +1,4 @@
-export class HashMap {
+export class HashSet {
     constructor(capacity = 16, load_factor = 0.75) {
         this.capacity = capacity;
         this.bucket = new Array(this.capacity).fill(null);
@@ -19,55 +19,43 @@ export class HashMap {
         return hashCode;
     }
 
-    // Add or update a key-value pair
-    set(key, value) {
+    set(key) {
         let bucketIndex = this.hash(key);
 
         // check if bucket is empty
         if (this.bucket[bucketIndex] === null) {
-            this.bucket[bucketIndex] = [[`${key}`, value]];
+            this.bucket[bucketIndex] = [key];
             this.totalStoredKeys++;
+            //validate
             this.validate();
-            return `Successfully Added -> [${key}: ${value}]`;
+            return `Successfully Added -> [${key}]`;
         } else {
             // check if the key stored is the same as key given then replace else append
             const bucketIndexLength = this.bucket[bucketIndex].length;
             for (let i = 0; i < bucketIndexLength; i++) {
-                const bucketKey = this.bucket[bucketIndex][i][0];
+                const bucketKey = this.bucket[bucketIndex][i];
+                // same as the key
                 if (bucketKey === key) {
-                    this.bucket[bucketIndex][i][1] = value;
-                    return `Successfully Replaced to -> [${key}: ${value}]`;
+                    this.bucket[bucketIndex][i] = key;
+                    return `Successfully Replaced to -> [${key}]`;
                 }
             }
-            this.bucket[bucketIndex].push([`${key}`, value]);
+            // not the same
+            this.bucket[bucketIndex].push(key);
         }
         this.totalStoredKeys++;
+        //validate
         this.validate();
-        return `Successfully Added -> [${key}: ${value}]`;
+        return `Successfully Added -> [${key}]`;
     }
-
     // Retrieve a value for a given key
-    get(key) {
-        const bucketIndex = this.hash(key);
-        if (this.bucket[bucketIndex]) {
-            const bucketIndexLength = this.bucket[bucketIndex].length;
-            for (let i = 0; i < bucketIndexLength; i++) {
-                const bucketKey = this.bucket[bucketIndex][i][0];
-                if (bucketKey === key) {
-                    return this.bucket[bucketIndex][i];
-                }
-            }
-        }
-        return null;
-    }
-
-    // Check if a key exists
     has(key) {
         const bucketIndex = this.hash(key);
+        //if the bucket is not empty
         if (this.bucket[bucketIndex]) {
             const bucketIndexLength = this.bucket[bucketIndex].length;
             for (let i = 0; i < bucketIndexLength; i++) {
-                const bucketKey = this.bucket[bucketIndex][i][0];
+                const bucketKey = this.bucket[bucketIndex][i];
                 if (bucketKey === key) {
                     return true;
                 }
@@ -75,15 +63,13 @@ export class HashMap {
         }
         return false;
     }
-
-    // Remove a key-value pair
     remove(key) {
         const bucketIndex = this.hash(key);
         //if the bucket is not empty
         if (this.bucket[bucketIndex]) {
             const bucketIndexLength = this.bucket[bucketIndex].length;
             for (let i = 0; i < bucketIndexLength; i++) {
-                const bucketKey = this.bucket[bucketIndex][i][0];
+                const bucketKey = this.bucket[bucketIndex][i];
                 if (bucketKey === key) {
                     if (bucketIndexLength === 1) {
                         this.bucket[bucketIndex] = null;
@@ -98,44 +84,16 @@ export class HashMap {
         }
         return false;
     }
-
     // Return the total number of keys stored
     length() {
         return this.totalStoredKeys;
     }
-
-    // Clear all entries from the map
+    // delete all entries
     clear() {
         this.bucket = new Array(this.capacity).fill(null);
         this.totalStoredKeys = 0;
         this.validate();
         return "Successfully Removed All Entries";
-    }
-
-    // Return all keys in the map
-    keys() {
-        let result = [];
-        for (let i = 0; i < this.bucket.length; i++) {
-            if (this.bucket[i]) {
-                for (let j = 0; j < this.bucket[i].length; j++) {
-                    result.push(this.bucket[i][j][0]);
-                }
-            }
-        }
-        return result;
-    }
-
-    // Return all values in the map
-    values() {
-        let result = [];
-        for (let i = 0; i < this.bucket.length; i++) {
-            if (this.bucket[i]) {
-                for (let j = 0; j < this.bucket[i].length; j++) {
-                    result.push(this.bucket[i][j][1]);
-                }
-            }
-        }
-        return result;
     }
     // Return all entries (key-value pairs)
     entries() {
@@ -149,30 +107,31 @@ export class HashMap {
         }
         return result;
     }
-
     // Resize the map if load factor is exceeded
     validate() {
-        if (this._rehashing) return; // break the infinite loop
+        if (this._rehashing) return;
 
         let newCapacity = this.capacity;
         while (this.totalStoredKeys / newCapacity > this.load_factor) {
             newCapacity *= 2;
         }
+
         if (newCapacity !== this.capacity) {
-            this.capacity = newCapacity;
             this._rehashing = true;
+            this.capacity = newCapacity;
             this.reHash();
             this._rehashing = false;
         }
     }
+
     // Rebuild the entire hash map when resized
     reHash() {
         const entries = this.entries();
         this.bucket = new Array(this.capacity).fill(null);
         this.totalStoredKeys = 0;
 
-        for (let [key, value] of entries) {
-            this.set(key, value);
+        for (let key of entries) {
+            this.set(key);
         }
     }
 }
